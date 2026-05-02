@@ -5,8 +5,8 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
-# Installs gsi keys into ramdisk, to boot a developer GSI with verified boot.
-$(call inherit-product, $(SRC_TARGET_DIR)/product/developer_gsi_keys.mk)
+# Disable Artifact Requirements
+DISABLE_ARTIFACT_PATH_REQUIREMENTS := true
 
 PRODUCT_COPY_FILES += \
     frameworks/native/data/etc/android.software.ipsec_tunnel_migration.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.software.ipsec_tunnel_migration.xml
@@ -75,29 +75,16 @@ PRODUCT_PRODUCT_VNDK_VERSION := current
 PRODUCT_ENFORCE_PRODUCT_PARTITION_INTERFACE := true
 
 # Init files
-ifeq (true,$(filter $(TARGET_BOOTS_16K) $(PRODUCT_16K_DEVELOPER_OPTION),true))
-PRODUCT_COPY_FILES += \
-	device/google/laguna/conf/init.efs.16k.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/hw/init.efs.rc \
-	device/google/laguna/conf/fstab.efs.from_data:$(TARGET_COPY_OUT_VENDOR)/etc/fstab.efs.from_data
-
-PRODUCT_PACKAGES += fsck.f2fs.vendor
-else
 PRODUCT_COPY_FILES += \
 	device/google/laguna/conf/init.efs.4k.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/hw/init.efs.rc
-endif
 
 # Recovery files
 PRODUCT_COPY_FILES += \
 	device/google/laguna/conf/init.recovery.device.rc:$(TARGET_COPY_OUT_RECOVERY)/root/init.recovery.laguna.rc
 
 # Fstab files
-ifeq (true,$(TARGET_BOOTS_16K))
-PRODUCT_SOONG_NAMESPACES += \
-        device/google/laguna/conf/fs-16kb
-else
 PRODUCT_SOONG_NAMESPACES += \
         device/google/laguna/conf/f2fs
-endif
 
 PRODUCT_PACKAGES += \
 	fstab.laguna \
@@ -365,15 +352,7 @@ PRODUCT_PACKAGES += \
     EuiccSupportPixelOverlay \
     FrameworkResOverlayProductLaguna \
     FrameworkResOverlayVendorLaguna \
-    GlanceableHubConfigOverlay \
-    GlanceableHubSettingsConfigOverlay \
-    GlanceableHubSettingsConfigOverlay2022 \
-    GlanceableHubSysuiConfigOverlay \
-    GoogleConfigOverlay \
     GooglePermissionControllerSafetyCenterOverlay \
-    PixelConfigOverlay2019 \
-    PixelConfigOverlay2021 \
-    PixelConfigOverlayCommon \
     PixelConnectivityOverlay2025 \
     PixelDisplayServiceOverlayProductLaguna \
     PixelNfcOverlayCommon \
@@ -405,6 +384,7 @@ PRODUCT_PACKAGES += \
 
 # Properties
 TARGET_PRODUCT_PROP += device/google/laguna/product.prop
+TARGET_SYSTEM_PROP += device/google/laguna/system.prop
 TARGET_SYSTEM_EXT_PROP += device/google/laguna/system_ext.prop
 TARGET_VENDOR_PROP += device/google/laguna/vendor.prop
 

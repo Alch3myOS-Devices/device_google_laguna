@@ -5,18 +5,16 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
+# Build Duplicates
+BUILD_BROKEN_DUP_RULES := true
+
 include build/make/target/board/BoardConfigMainlineCommon.mk
 include build/make/target/board/BoardConfigPixelCommon.mk
 
-# Include settings for 16k page size kernel if enabled.
-ifneq ($(wildcard $(TARGET_KERNEL_DIR)/16kb/),)
-include device/google/laguna/BoardConfig-16k-common.mk
-endif
-
 TARGET_ARCH := arm64
-TARGET_ARCH_VARIANT := armv8-2a
+TARGET_ARCH_VARIANT := armv9-a
 TARGET_CPU_ABI := arm64-v8a
-TARGET_CPU_VARIANT := cortex-a55
+TARGET_CPU_VARIANT := cortex-a510
 
 BOARD_BOOTCONFIG += \
     androidboot.load_modules_parallel=true \
@@ -166,9 +164,6 @@ BOARD_GOOGLE_DYNAMIC_PARTITIONS_PARTITION_LIST := \
 # Set error limit to BOARD_SUPER_PARTITON_SIZE - 500MB
 BOARD_SUPER_PARTITION_ERROR_LIMIT := 8006926336
 
-# Reserve space for gapps install
--include vendor/lineage/config/BoardConfigReservedSize.mk
-
 # Build a separate system_dlkm partition
 BOARD_USES_SYSTEM_DLKMIMAGE := true
 BOARD_SYSTEM_DLKMIMAGE_FILE_SYSTEM_TYPE := ext4
@@ -260,3 +255,18 @@ SYSTEM_EXT_PUBLIC_SEPOLICY_DIRS += \
 
 # Protected VM firmware
 BOARD_PVMFWIMAGE_PARTITION_SIZE := 0x00100000
+
+# =========================================================
+# Alch3myOS Partition Size Fixes
+# =========================================================
+
+# Reclaim space by reducing the 'reserved' buffer in each partition.
+# Google's defaults are very large; these 20MB buffers are much safer for custom ROMs.
+BOARD_PRODUCTIMAGE_PARTITION_RESERVED_SIZE := 20971520
+BOARD_SYSTEMIMAGE_PARTITION_RESERVED_SIZE := 20971520
+BOARD_SYSTEM_EXTIMAGE_PARTITION_RESERVED_SIZE := 20971520
+BOARD_VENDORIMAGE_PARTITION_RESERVED_SIZE := 20971520
+
+# Disable the system_other image to save 66MB and avoid partition checks on it.
+# system_other is mostly for pre-optimization cache and isn't needed for Alch3myOS.
+BOARD_BUILD_SYSTEM_OTHER_IMAGE := false
